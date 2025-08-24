@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -8,6 +10,9 @@ function Login() {
   });
   const [mensagem, setMensagem] = useState('');
   const [erro, setErro] = useState('');
+
+  const { loginAction } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,7 +26,7 @@ function Login() {
 
     try {
       const response = await axios.post('http://localhost:5000/login', formData);
-      setMensagem(response.data.message);
+      loginAction(response.data);
     } catch (error) {
       setErro(error.response?.data?.error || 'Ocorreu um erro ao fazer login.');
     }

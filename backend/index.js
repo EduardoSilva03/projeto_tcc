@@ -1,19 +1,16 @@
-// index.js
-
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 
-// --- CONFIGURAÇÃO DO SERVIDOR ---
 const app = express();
 const PORT = 5000;
+const SEGREDO_JWT = 'seu-segredo-super-secreto-para-jwt';
 
-// --- MIDDLEWARE ---
-app.use(cors()); // Habilita o CORS para todas as rotas
-app.use(express.json()); // Habilita o parsing de JSON no corpo das requisições
+app.use(cors());
+app.use(express.json());
 
-// --- CONFIGURAÇÃO DA CONEXÃO COM O POSTGRESQL ---
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
@@ -22,26 +19,18 @@ const pool = new Pool({
   port: 5432,
 });
 
-// --- ROTAS DA API ---
-
-/**
- * ROTA DE CADASTRO DE USUÁRIO
- */
 app.post('/cadastro', async (req, res) => {
   const { nome, sobrenome, email, senha } = req.body;
 
   try {
-    // 1. Verificar se o e-mail já existe
     const usuarioExistente = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
     if (usuarioExistente.rows.length > 0) {
       return res.status(400).json({ error: 'Este e-mail já está em uso.' });
     }
 
-    // 2. Criptografar a senha
-    const saltRounds = 10; // Fator de custo para a complexidade da criptografia
+    const saltRounds = 10;
     const senhaHash = await bcrypt.hash(senha, saltRounds);
 
-    // 3. Inserir o novo usuário no banco de dados
     const novoUsuario = await pool.query(
       'INSERT INTO usuarios (nome, sobrenome, email, senha_hash) VALUES ($1, $2, $3, $4) RETURNING id, email',
       [nome, sobrenome, email, senhaHash]
@@ -55,37 +44,105 @@ app.post('/cadastro', async (req, res) => {
   }
 });
 
-/**
- * ROTA DE LOGIN DE USUÁRIO
- */
 app.post('/login', async (req, res) => {
   const { email, senha } = req.body;
 
   try {
-    // 1. Verificar se o usuário existe
     const resultado = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
     if (resultado.rows.length === 0) {
       return res.status(401).json({ error: 'E-mail ou senha inválidos.' });
     }
     const usuario = resultado.rows[0];
 
-    // 2. Comparar a senha fornecida com a senha_hash armazenada
     const senhaCorreta = await bcrypt.compare(senha, usuario.senha_hash);
     if (!senhaCorreta) {
       return res.status(401).json({ error: 'E-mail ou senha inválidos.' });
     }
 
-    // Login bem-sucedido (em uma aplicação real, aqui você geraria um token JWT)
-    res.status(200).json({ message: `Login bem-sucedido! Bem-vindo, ${usuario.nome}.` });
+    const token = jwt.sign(
+        { id: usuario.id, email: usuario.email, nome: usuario.nome },
+        SEGREDO_JWT,
+        { expiresIn: '8h' }
+    );
+
+    res.status(200).json({ 
+        message: `Login bem-sucedido! Bem-vindo, ${usuario.nome}.`,
+        token: token 
+    });
 
   } catch (error) {
-    console.error('Erro no login:', error.message);
+    console.error('Erro no login web:', error.message);
     res.status(500).json({ error: 'Erro interno do servidor.' });
   }
 });
 
+const verificarToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
 
-// --- INICIAR O SERVIDOR ---
+    if (!token) {
+        return res.status(401).json({ error: 'Acesso negado. Nenhum token fornecido.' });
+    }
+
+    jwt.verify(token, SEGREDO_JWT, (err, decoded) => {
+        if (err) {
+            return res.status(403).json({ error: 'Token inválido.' });
+        }
+        req.usuarioId = decoded.id;
+        next();
+    });
+};
+
+
+app.post('/cadastro-mobile', verificarToken, async (req, res) => {
+    const { nome, sobrenome, email, senha } = req.body;
+    const adminId = req.usuarioId;
+
+    try {
+        const usuarioExistente = await pool.query('SELECT * FROM usuarios_mobile WHERE email = $1', [email]);
+        if (usuarioExistente.rows.length > 0) {
+            return res.status(400).json({ error: 'Este e-mail já está em uso no sistema mobile.' });
+        }
+
+        const saltRounds = 10;
+        const senhaHash = await bcrypt.hash(senha, saltRounds);
+
+        const novoUsuario = await pool.query(
+            'INSERT INTO usuarios_mobile (nome, sobrenome, email, senha_hash, cadastrado_por_usuario_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, email',
+            [nome, sobrenome, email, senhaHash, adminId]
+        );
+
+        res.status(201).json({ message: 'Usuário mobile cadastrado com sucesso!', usuario: novoUsuario.rows[0] });
+
+    } catch (error) {
+        console.error('Erro no cadastro mobile:', error.message);
+        res.status(500).json({ error: 'Erro interno do servidor.' });
+    }
+});
+
+app.post('/login-mobile', async (req, res) => {
+    const { email, senha } = req.body;
+
+    try {
+        const resultado = await pool.query('SELECT * FROM usuarios_mobile WHERE email = $1', [email]);
+        if (resultado.rows.length === 0) {
+            return res.status(401).json({ error: 'E-mail ou senha inválidos.' });
+        }
+        const usuario = resultado.rows[0];
+
+        const senhaCorreta = await bcrypt.compare(senha, usuario.senha_hash);
+        if (!senhaCorreta) {
+            return res.status(401).json({ error: 'E-mail ou senha inválidos.' });
+        }
+        
+        res.status(200).json({ message: `Login mobile bem-sucedido! Bem-vindo, ${usuario.nome}.`});
+
+    } catch (error) {
+        console.error('Erro no login mobile:', error.message);
+        res.status(500).json({ error: 'Erro interno do servidor.' });
+    }
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Servidor backend rodando na porta ${PORT}`);
 });
