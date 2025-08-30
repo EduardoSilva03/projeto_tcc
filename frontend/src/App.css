@@ -104,3 +104,98 @@ button:hover {
 .logout-button:hover {
   background-color: #c82333;
 }
+
+.dashboard-content {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.users-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.users-header h2 {
+    margin: 0;
+}
+
+.button-add {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 18px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.button-add:hover {
+    background-color: #218838;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.users-table th, .users-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+.users-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.users-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+.button-admin {
+    background-color: #ffc107;
+    color: #212529;
+    padding: 6px 12px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+.button-admin:hover {
+    background-color: #e0a800;
+}
+
+.edit-user-container {
+    max-width: 700px;
+    margin: 20px auto;
+}
+
+.edit-user-container .form-container {
+    margin-top: 20px;
+}
+
+.edit-user-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}

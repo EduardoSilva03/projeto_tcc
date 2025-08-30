@@ -1,58 +1,80 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 function Dashboard() {
     const { logOut, token } = useContext(AuthContext);
-    const [formData, setFormData] = useState({
-        nome: '',
-        sobrenome: '',
-        email: '',
-        senha: '',
-    });
-    const [mensagem, setMensagem] = useState('');
-    const [erro, setErro] = useState('');
+    const [mobileUsers, setMobileUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setMensagem('');
-        setErro('');
-
-        try {
-            const headers = {
-                'Authorization': `Bearer ${token}`
+    useEffect(() => {
+        if (token) {
+            const fetchMobileUsers = async () => {
+                try {
+                    const headers = { 'Authorization': `Bearer ${token}` };
+                    const response = await axios.get('http://localhost:5000/mobile-users', { headers });
+                    setMobileUsers(response.data);
+                } catch (err) {
+                    setError('Não foi possível carregar os usuários.');
+                } finally {
+                    setLoading(false);
+                }
             };
-            const response = await axios.post('http://localhost:5000/cadastro-mobile', formData, { headers });
-            setMensagem(response.data.message);
-            setFormData({ nome: '', sobrenome: '', email: '', senha: '' });
-        } catch (error) {
-            setErro(error.response?.data?.error || 'Ocorreu um erro ao cadastrar usuário mobile.');
+
+            fetchMobileUsers();
         }
-    };
+    }, [token]);
 
     return (
         <div className="dashboard-container">
             <header className="dashboard-header">
-                <h1>Painel Administrativo</h1>
+                <h1>Painel de Controle</h1>
                 <button onClick={logOut} className="logout-button">Sair</button>
             </header>
             
-            <div className="form-container">
-                <h2>Cadastrar Novo Usuário Mobile</h2>
-                <form onSubmit={handleSubmit}>
-                    <input type="text" name="nome" value={formData.nome} onChange={handleChange} placeholder="Nome" required />
-                    <input type="text" name="sobrenome" value={formData.sobrenome} onChange={handleChange} placeholder="Sobrenome" required />
-                    <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="E-mail" required />
-                    <input type="password" name="senha" value={formData.senha} onChange={handleChange} placeholder="Senha Provisória" required />
-                    <button type="submit">Cadastrar Usuário Mobile</button>
-                </form>
-                {mensagem && <p className="success-message">{mensagem}</p>}
-                {erro && <p className="error-message">{erro}</p>}
+            <div className="dashboard-content">
+                <div className="users-header">
+                    <h2>Usuários Mobile Cadastrados</h2>
+                    <Link to="/dashboard/cadastro-mobile" className="button-add">
+                        Cadastrar Novo Usuário
+                    </Link>
+                </div>
+                
+                {loading && <p>Carregando usuários...</p>}
+                {error && <p className="error-message">{error}</p>}
+                
+                {!loading && !error && (
+                    mobileUsers.length > 0 ? (
+                        <table className="users-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Sobrenome</th>
+                                    <th>Email</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {mobileUsers.map(user => (
+                                    <tr key={user.id}>
+                                        <td>{user.nome}</td>
+                                        <td>{user.sobrenome}</td>
+                                        <td>{user.email}</td>
+                                        <td>
+                                            <Link to={`/dashboard/user/${user.id}`} className="button-admin">
+                                                Administrar
+                                            </Link>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <p>Nenhum usuário mobile cadastrado ainda.</p>
+                    )
+                )}
             </div>
         </div>
     );
