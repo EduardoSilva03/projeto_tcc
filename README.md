@@ -1,3 +1,30 @@
+Iniciar o Emulador
+
+1. Inicie o Android Studio
+2. Virtual Device Manager
+3. Inicie seu Emulador Android
+4. Aguarde o sistema operacional do emulador carregar completamente antes de prosseguir
+
+Terminal 1 (Backend API)
+
+cd backend
+npm run dev
+
+Terminal 2 (Frontend Web)
+
+cd frontend
+npm start
+
+Terminal 3 (Mobile - Metro Bundler)
+
+cd AppMobile
+npx react-native start
+
+Terminal 4 (Mobile - Build & Run)
+
+cd AppMobile
+npx react-native run-android
+
 # The-Portfolio-Playbook-I
 The-Portfolio-Playbook-I
 
