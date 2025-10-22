@@ -2,9 +2,12 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './routes/ProtectedRoute';
-
 import HomePage from './components/HomePage';
 import Dashboard from './components/Dashboard';
+import CadastroEmpresa from './components/CadastroEmpresa';
+import EmpresaDetalhes from './components/EmpresaDetalhes';
+import CadastroImovel from './components/CadastroImovel';
+import ImovelDetalhes from './components/ImovelDetalhes';
 import CadastroMobile from './components/CadastroMobile';
 import EditUser from './components/EditUser';
 
@@ -18,9 +21,12 @@ function App() {
           <main>
             <Routes>
               <Route path="/" element={<HomePage />} />
-              
               <Route element={<ProtectedRoute />}>
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/dashboard/cadastro-empresa" element={<CadastroEmpresa />} />
+                <Route path="/dashboard/empresa/:empresaId" element={<EmpresaDetalhes />} />
+                <Route path="/dashboard/empresa/:empresaId/cadastro-imovel" element={<CadastroImovel />} />
+                <Route path="/dashboard/imovel/:imovelId" element={<ImovelDetalhes />} />
                 <Route path="/dashboard/cadastro-mobile" element={<CadastroMobile />} />
                 <Route path="/dashboard/user/:userId" element={<EditUser />} />
               </Route>

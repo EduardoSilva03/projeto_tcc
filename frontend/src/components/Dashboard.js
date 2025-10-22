@@ -5,25 +5,24 @@ import { Link } from 'react-router-dom';
 
 function Dashboard() {
     const { logOut, token } = useContext(AuthContext);
-    const [mobileUsers, setMobileUsers] = useState([]);
+    const [empresas, setEmpresas] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
         if (token) {
-            const fetchMobileUsers = async () => {
+            const fetchEmpresas = async () => {
                 try {
                     const headers = { 'Authorization': `Bearer ${token}` };
-                    const response = await axios.get('http://localhost:5000/mobile-users', { headers });
-                    setMobileUsers(response.data);
+                    const response = await axios.get('http://localhost:5000/empresas', { headers });
+                    setEmpresas(response.data);
                 } catch (err) {
-                    setError('Não foi possível carregar os usuários.');
+                    setError('Não foi possível carregar as empresas.');
                 } finally {
                     setLoading(false);
                 }
             };
-
-            fetchMobileUsers();
+            fetchEmpresas();
         }
     }, [token]);
 
@@ -31,39 +30,46 @@ function Dashboard() {
         <div className="dashboard-container">
             <header className="dashboard-header">
                 <h1>Painel de Controle</h1>
-                <button onClick={logOut} className="logout-button">Sair</button>
+                <div>
+                    <Link to="/dashboard/cadastro-mobile" className="button-add" style={{backgroundColor: '#17a2b8', marginRight: '10px'}}>
+                        Cadastrar Usuário Mobile
+                    </Link>
+                    <button onClick={logOut} className="logout-button">Sair</button>
+                </div>
             </header>
             
             <div className="dashboard-content">
                 <div className="users-header">
-                    <h2>Usuários Mobile Cadastrados</h2>
-                    <Link to="/dashboard/cadastro-mobile" className="button-add">
-                        Cadastrar Novo Usuário
+                    <h2>Minhas Empresas</h2>
+                    <Link to="/dashboard/cadastro-empresa" className="button-add">
+                        Cadastrar Nova Empresa
                     </Link>
                 </div>
                 
-                {loading && <p>Carregando usuários...</p>}
+                {loading && <p>Carregando...</p>}
                 {error && <p className="error-message">{error}</p>}
                 
                 {!loading && !error && (
-                    mobileUsers.length > 0 ? (
+                    empresas.length > 0 ? (
                         <table className="users-table">
                             <thead>
                                 <tr>
-                                    <th>Nome</th>
-                                    <th>Sobrenome</th>
-                                    <th>Email</th>
+                                    <th>Nome Fantasia</th>
+                                    <th>Razão Social</th>
+                                    <th>CNPJ</th>
+                                    <th>Status</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {mobileUsers.map(user => (
-                                    <tr key={user.id}>
-                                        <td>{user.nome}</td>
-                                        <td>{user.sobrenome}</td>
-                                        <td>{user.email}</td>
+                                {empresas.map(empresa => (
+                                    <tr key={empresa.id}>
+                                        <td>{empresa.nome_fantasia || 'N/A'}</td>
+                                        <td>{empresa.razao_social}</td>
+                                        <td>{empresa.cnpj}</td>
+                                        <td>{empresa.is_ativa ? 'Ativa' : 'Inativa'}</td>
                                         <td>
-                                            <Link to={`/dashboard/user/${user.id}`} className="button-admin">
+                                            <Link to={`/dashboard/empresa/${empresa.id}`} className="button-admin">
                                                 Administrar
                                             </Link>
                                         </td>
@@ -72,7 +78,7 @@ function Dashboard() {
                             </tbody>
                         </table>
                     ) : (
-                        <p>Nenhum usuário mobile cadastrado ainda.</p>
+                        <p>Nenhuma empresa cadastrada ainda.</p>
                     )
                 )}
             </div>
