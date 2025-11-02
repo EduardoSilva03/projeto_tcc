@@ -16,24 +16,24 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'empreendimentos',
-  password: 'root',
-  port: 5432,
+    user: 'postgres',
+    host: 'localhost',
+    database: 'empreendimentos',
+    password: 'root',
+    port: 5432,
 });
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    const nomeUnico = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + nomeUnico + path.extname(file.originalname));
-  }
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        const nomeUnico = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + nomeUnico + path.extname(file.originalname));
+    }
 });
 
-const upload = multer({ 
+const upload = multer({
     storage: storage,
     limits: { fileSize: 10 * 1024 * 1024 }
 });
@@ -56,7 +56,7 @@ app.post('/empresas', verificarToken, async (req, res) => {
     try {
         const cnpjExistente = await pool.query('SELECT id FROM empresas WHERE cnpj = $1', [cnpj]);
         if (cnpjExistente.rows.length > 0) return res.status(400).json({ error: 'Este CNPJ já está cadastrado.' });
-        
+
         const novaEmpresa = await pool.query(
             'INSERT INTO empresas (usuario_id, cnpj, razao_social, nome_fantasia, data_abertura, natureza_juridica, is_ativa) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
             [adminId, cnpj, razao_social, nome_fantasia, data_abertura, natureza_juridica, is_ativa]
@@ -90,7 +90,7 @@ app.post('/empresas/:empresaId/imoveis', verificarToken, async (req, res) => {
     try {
         const empresa = await pool.query('SELECT id FROM empresas WHERE id = $1 AND usuario_id = $2', [empresaId, adminId]);
         if (empresa.rows.length === 0) return res.status(403).json({ error: 'Acesso negado a esta empresa.' });
-        
+
         const novoImovel = await pool.query(
             `INSERT INTO imoveis (usuario_id, empresa_id, nome_residencial, tipo_imovel, unidade, valor, cep, rua, numero, bairro, cidade, estado, complemento, link_google_maps, situacao, data_entrega_prevista, is_financiamento_liberado, financiamento_aceito)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) RETURNING *`,
@@ -151,9 +151,9 @@ app.post('/imoveis/:id/fotos', verificarToken, upload.single('foto'), async (req
             [imovelId, empresa_id, adminId, link_foto, titulo]
         );
         res.status(201).json(novaFoto.rows[0]);
-    } catch (error) { 
-        console.error('Erro ao adicionar foto:', error.message); 
-        res.status(500).json({ error: 'Erro interno do servidor.' }); 
+    } catch (error) {
+        console.error('Erro ao adicionar foto:', error.message);
+        res.status(500).json({ error: 'Erro interno do servidor.' });
     }
 });
 
@@ -179,10 +179,10 @@ app.post('/cadastro-mobile', verificarToken, async (req, res) => {
     try {
         const usuarioExistente = await pool.query('SELECT * FROM usuarios_mobile WHERE email = $1', [email]);
         if (usuarioExistente.rows.length > 0) return res.status(400).json({ error: 'Este e-mail já está em uso.' });
-        
+
         const saltRounds = 10;
         const senhaHash = await bcrypt.hash(senha, saltRounds);
-        
+
         const novoUsuario = await pool.query(
             'INSERT INTO usuarios_mobile (nome, sobrenome, email, senha_hash, cadastrado_por_usuario_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, nome',
             [nome, sobrenome, email, senhaHash, adminId]
@@ -246,31 +246,31 @@ app.delete('/empresas/:empresaId/desvincular-usuario/:usuarioId', verificarToken
 });
 
 app.post('/cadastro', async (req, res) => {
-  const { nome, sobrenome, email, senha } = req.body;
-  try {
-    const usuarioExistente = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
-    if (usuarioExistente.rows.length > 0) return res.status(400).json({ error: 'Este e-mail já está em uso.' });
-    const saltRounds = 10;
-    const senhaHash = await bcrypt.hash(senha, saltRounds);
-    const novoUsuario = await pool.query(
-      'INSERT INTO usuarios (nome, sobrenome, email, senha_hash) VALUES ($1, $2, $3, $4) RETURNING id, email',
-      [nome, sobrenome, email, senhaHash]
-    );
-    res.status(201).json(novoUsuario.rows[0]);
-  } catch (error) { console.error('Erro no cadastro web:', error.message); res.status(500).json({ error: 'Erro interno do servidor.' }); }
+    const { nome, sobrenome, email, senha } = req.body;
+    try {
+        const usuarioExistente = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+        if (usuarioExistente.rows.length > 0) return res.status(400).json({ error: 'Este e-mail já está em uso.' });
+        const saltRounds = 10;
+        const senhaHash = await bcrypt.hash(senha, saltRounds);
+        const novoUsuario = await pool.query(
+            'INSERT INTO usuarios (nome, sobrenome, email, senha_hash) VALUES ($1, $2, $3, $4) RETURNING id, email',
+            [nome, sobrenome, email, senhaHash]
+        );
+        res.status(201).json(novoUsuario.rows[0]);
+    } catch (error) { console.error('Erro no cadastro web:', error.message); res.status(500).json({ error: 'Erro interno do servidor.' }); }
 });
 
 app.post('/login', async (req, res) => {
-  const { email, senha } = req.body;
-  try {
-    const resultado = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
-    if (resultado.rows.length === 0) return res.status(401).json({ error: 'E-mail ou senha inválidos.' });
-    const usuario = resultado.rows[0];
-    const senhaCorreta = await bcrypt.compare(senha, usuario.senha_hash);
-    if (!senhaCorreta) return res.status(401).json({ error: 'E-mail ou senha inválidos.' });
-    const token = jwt.sign({ id: usuario.id, email: usuario.email, nome: usuario.nome }, SEGREDO_JWT, { expiresIn: '8h' });
-    res.status(200).json({ message: `Login bem-sucedido!`, token: token });
-  } catch (error) { console.error('Erro no login web:', error.message); res.status(500).json({ error: 'Erro interno do servidor.' }); }
+    const { email, senha } = req.body;
+    try {
+        const resultado = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+        if (resultado.rows.length === 0) return res.status(401).json({ error: 'E-mail ou senha inválidos.' });
+        const usuario = resultado.rows[0];
+        const senhaCorreta = await bcrypt.compare(senha, usuario.senha_hash);
+        if (!senhaCorreta) return res.status(401).json({ error: 'E-mail ou senha inválidos.' });
+        const token = jwt.sign({ id: usuario.id, email: usuario.email, nome: usuario.nome }, SEGREDO_JWT, { expiresIn: '8h' });
+        res.status(200).json({ message: `Login bem-sucedido!`, token: token });
+    } catch (error) { console.error('Erro no login web:', error.message); res.status(500).json({ error: 'Erro interno do servidor.' }); }
 });
 
 app.post('/login-mobile', async (req, res) => {
@@ -278,7 +278,7 @@ app.post('/login-mobile', async (req, res) => {
     try {
         const resultado = await pool.query('SELECT * FROM usuarios_mobile WHERE email = $1', [email]);
         if (resultado.rows.length === 0) return res.status(401).json({ error: 'E-mail ou senha inválidos.' });
-        
+
         const usuario = resultado.rows[0];
         const senhaCorreta = await bcrypt.compare(senha, usuario.senha_hash);
         if (!senhaCorreta) return res.status(401).json({ error: 'E-mail ou senha inválidos.' });
@@ -286,6 +286,78 @@ app.post('/login-mobile', async (req, res) => {
         const token = jwt.sign({ id: usuario.id, email: usuario.email, tipo: 'mobile' }, SEGREDO_JWT, { expiresIn: '30d' });
         res.status(200).json({ message: `Login bem-sucedido!`, token: token });
     } catch (error) { console.error('Erro no login mobile:', error.message); res.status(500).json({ error: 'Erro interno do servidor.' }); }
+});
+
+app.patch('/mobile/imoveis/:id/reservar-visita', verificarToken, async (req, res) => {
+    const imovelId = req.params.id;
+    const mobileUserId = req.usuarioId;
+
+    try {
+        const imovel = await pool.query('SELECT visitante_atual_id FROM imoveis WHERE id = $1', [imovelId]);
+        if (imovel.rows.length === 0) {
+            return res.status(404).json({ error: 'Imóvel não encontrado.' });
+        }
+        if (imovel.rows[0].visitante_atual_id !== null) {
+            return res.status(409).json({ error: 'Este imóvel já está em visita por outro usuário.' });
+        }
+
+        await pool.query(
+            'UPDATE imoveis SET visitante_atual_id = $1 WHERE id = $2',
+            [mobileUserId, imovelId]
+        );
+
+        const visitante = await pool.query('SELECT nome, sobrenome FROM usuarios_mobile WHERE id = $1', [mobileUserId]);
+        res.status(200).json({
+            message: 'Visita reservada com sucesso!',
+            visitante: {
+                id: mobileUserId,
+                nome_completo: `${visitante.rows[0].nome} ${visitante.rows[0].sobrenome}`
+            }
+        });
+
+    } catch (error) {
+        console.error('Erro ao reservar visita:', error.message);
+        res.status(500).json({ error: 'Erro interno do servidor.' });
+    }
+});
+
+app.patch('/mobile/imoveis/:id/finalizar-visita', verificarToken, async (req, res) => {
+    const imovelId = req.params.id;
+    const mobileUserId = req.usuarioId;
+
+    try {
+        const imovel = await pool.query('SELECT visitante_atual_id FROM imoveis WHERE id = $1', [imovelId]);
+        if (imovel.rows.length === 0) {
+            return res.status(404).json({ error: 'Imóvel não encontrado.' });
+        }
+        if (imovel.rows[0].visitante_atual_id !== mobileUserId) {
+            return res.status(403).json({ error: 'Você não pode finalizar uma visita que não é sua.' });
+        }
+
+        await pool.query(
+            'UPDATE imoveis SET visitante_atual_id = NULL WHERE id = $1',
+            [imovelId]
+        );
+
+        res.status(200).json({ message: 'Visita finalizada com sucesso!' });
+
+    } catch (error) {
+        console.error('Erro ao finalizar visita:', error.message);
+        res.status(500).json({ error: 'Erro interno do servidor.' });
+    }
+});
+
+app.get('/mobile/me', verificarToken, async (req, res) => {
+    try {
+        const user = await pool.query('SELECT id, nome, sobrenome FROM usuarios_mobile WHERE id = $1', [req.usuarioId]);
+        if (user.rows.length === 0) {
+            return res.status(404).json({ error: 'Usuário não encontrado.' });
+        }
+        res.status(200).json(user.rows[0]);
+    } catch (error) {
+        console.error('Erro ao buscar perfil:', error.message);
+        res.status(500).json({ error: 'Erro interno do servidor.' });
+    }
 });
 
 app.get('/mobile/minhas-empresas', verificarToken, async (req, res) => {
@@ -308,24 +380,39 @@ app.get('/mobile/empresas/:id/imoveis', verificarToken, async (req, res) => {
         const acesso = await pool.query('SELECT * FROM empresa_usuarios_mobile WHERE empresa_id = $1 AND usuario_id = $2', [empresaId, mobileUserId]);
         if (acesso.rows.length === 0) return res.status(403).json({ error: 'Acesso negado a esta empresa.' });
 
-        const imoveis = await pool.query('SELECT * FROM imoveis WHERE empresa_id = $1 AND is_vendido = false', [empresaId]);
-        const imovelIds = imoveis.rows.map(imovel => imovel.id);
+        const imoveisRes = await pool.query(
+            `SELECT im.*, 
+                um.nome AS visitante_nome, 
+                um.sobrenome AS visitante_sobrenome
+         FROM imoveis im
+         LEFT JOIN usuarios_mobile um ON im.visitante_atual_id = um.id
+         WHERE im.empresa_id = $1 AND im.is_vendido = false`,
+            [empresaId]
+        );
+
+        const imoveis = imoveisRes.rows;
+        const imovelIds = imoveis.map(imovel => imovel.id);
         if (imovelIds.length === 0) return res.status(200).json([]);
 
         const fotos = await pool.query('SELECT * FROM fotos_imoveis WHERE imovel_id = ANY($1::int[])', [imovelIds]);
-        
-        const imoveisComFotos = imoveis.rows.map(imovel => ({
+
+        const imoveisComFotos = imoveis.map(imovel => ({
             ...imovel,
+            visitante_nome_completo: (imovel.visitante_nome) ? `${imovel.visitante_nome} ${imovel.visitante_sobrenome}` : null,
             fotos: fotos.rows.filter(foto => foto.imovel_id === imovel.id)
         }));
         res.status(200).json(imoveisComFotos);
-    } catch (error) { console.error('Erro ao buscar imóveis do mobile:', error.message); res.status(500).json({ error: 'Erro interno do servidor.' }); }
+
+    } catch (error) {
+        console.error('Erro ao buscar imóveis do mobile:', error.message);
+        res.status(500).json({ error: 'Erro interno do servidor.' });
+    }
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor backend rodando na porta ${PORT}`);
-  if (!fs.existsSync('uploads')) {
-    fs.mkdirSync('uploads');
-    console.log('Pasta "uploads" criada com sucesso.');
-  }
+    console.log(`🚀 Servidor backend rodando na porta ${PORT}`);
+    if (!fs.existsSync('uploads')) {
+        fs.mkdirSync('uploads');
+        console.log('Pasta "uploads" criada com sucesso.');
+    }
 });
