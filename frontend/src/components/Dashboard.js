@@ -31,7 +31,6 @@ function Dashboard() {
             <header className="dashboard-header">
                 <h1>Painel de Controle</h1>
                 <div>
-                    {/* *** TEXTO DO BOTÃO ATUALIZADO *** */}
                     <Link to="/dashboard/cadastro-mobile" className="button-add" style={{backgroundColor: '#17a2b8', marginRight: '10px'}}>
                         Gerenciar Usuários Mobile
                     </Link>
