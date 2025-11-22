@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+// Importando ícones
+import { Building2, UserPlus, LogOut, Settings, Plus } from 'lucide-react';
 
 function Dashboard() {
     const { logOut, token } = useContext(AuthContext);
@@ -29,56 +31,82 @@ function Dashboard() {
     return (
         <div className="dashboard-container">
             <header className="dashboard-header">
-                <h1>Painel de Controle</h1>
-                <div>
-                    <Link to="/dashboard/cadastro-mobile" className="button-add" style={{backgroundColor: '#17a2b8', marginRight: '10px'}}>
-                        Gerenciar Usuários Mobile
+                <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                    <Building2 size={32} color="#2563eb" />
+                    <h1>Painel de Controle</h1>
+                </div>
+                <div style={{display: 'flex', gap: '10px'}}>
+                    <Link to="/dashboard/cadastro-mobile" className="button-add" style={{backgroundColor: '#64748b'}}>
+                        <UserPlus size={18} style={{marginRight: '8px'}}/>
+                        Usuários Mobile
                     </Link>
-                    <button onClick={logOut} className="logout-button">Sair</button>
+                    <button onClick={logOut} className="logout-button">
+                        <LogOut size={18} style={{marginRight: '8px'}}/>
+                        Sair
+                    </button>
                 </div>
             </header>
             
             <div className="dashboard-content">
-                <div className="users-header">
-                    <h2>Minhas Empresas</h2>
+                <div className="users-header" style={{borderBottom: '1px solid #e5e7eb', paddingBottom: '15px', marginBottom: '20px'}}>
+                    <h2 style={{margin: 0, fontSize: '1.25rem'}}>Minhas Empresas</h2>
                     <Link to="/dashboard/cadastro-empresa" className="button-add">
-                        Cadastrar Nova Empresa
+                        <Plus size={18} style={{marginRight: '8px'}}/>
+                        Nova Empresa
                     </Link>
                 </div>
                 
-                {loading && <p>Carregando...</p>}
+                {loading && <p style={{textAlign: 'center', padding: '20px'}}>Carregando...</p>}
                 {error && <p className="error-message">{error}</p>}
                 
                 {!loading && !error && (
                     empresas.length > 0 ? (
-                        <table className="users-table">
-                            <thead>
-                                <tr>
-                                    <th>Nome Fantasia</th>
-                                    <th>Razão Social</th>
-                                    <th>CNPJ</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {empresas.map(empresa => (
-                                    <tr key={empresa.id}>
-                                        <td>{empresa.nome_fantasia || 'N/A'}</td>
-                                        <td>{empresa.razao_social}</td>
-                                        <td>{empresa.cnpj}</td>
-                                        <td>{empresa.is_ativa ? 'Ativa' : 'Inativa'}</td>
-                                        <td>
-                                            <Link to={`/dashboard/empresa/${empresa.id}`} className="button-admin">
-                                                Administrar
-                                            </Link>
-                                        </td>
+                        <div style={{overflowX: 'auto'}}>
+                            <table className="users-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome Fantasia</th>
+                                        <th>Razão Social</th>
+                                        <th>CNPJ</th>
+                                        <th>Status</th>
+                                        <th style={{textAlign: 'right'}}>Ações</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {empresas.map(empresa => (
+                                        <tr key={empresa.id}>
+                                            <td style={{fontWeight: '500'}}>{empresa.nome_fantasia || 'N/A'}</td>
+                                            <td>{empresa.razao_social}</td>
+                                            <td>{empresa.cnpj}</td>
+                                            <td>
+                                                <span style={{
+                                                    padding: '4px 8px', 
+                                                    borderRadius: '12px', 
+                                                    fontSize: '0.75rem',
+                                                    backgroundColor: empresa.is_ativa ? '#d1fae5' : '#f3f4f6',
+                                                    color: empresa.is_ativa ? '#065f46' : '#374151',
+                                                    fontWeight: '600'
+                                                }}>
+                                                    {empresa.is_ativa ? 'ATIVA' : 'INATIVA'}
+                                                </span>
+                                            </td>
+                                            <td style={{textAlign: 'right'}}>
+                                                <Link to={`/dashboard/empresa/${empresa.id}`} className="button-admin">
+                                                    <Settings size={16} style={{marginRight: '5px'}}/>
+                                                    Gerenciar
+                                                </Link>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     ) : (
-                        <p>Nenhuma empresa cadastrada ainda.</p>
+                        <div style={{textAlign: 'center', padding: '40px', color: '#6b7280'}}>
+                            <Building2 size={48} style={{marginBottom: '10px', opacity: 0.5}}/>
+                            <p>Nenhuma empresa cadastrada ainda.</p>
+                            <Link to="/dashboard/cadastro-empresa" style={{color: '#2563eb', fontWeight: '500'}}>Comece criando uma agora</Link>
+                        </div>
                     )
                 )}
             </div>
