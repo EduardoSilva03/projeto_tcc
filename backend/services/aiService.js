@@ -2,7 +2,7 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 
-const GOOGLE_API_KEY = 'AIzaSyDV-9Efadk7XvJuxBkfzsmPZWh8E1kmP-Y';
+const GOOGLE_API_KEY = 'AIzaSyDTuAV_u0Cpwxo2lcQ6YKG2vD6r1RkHDhw';
 
 function extractCoordsFromMapLink(url) {
     if (!url) return null;
@@ -79,6 +79,9 @@ async function generateAIDescription(placesData) {
         
         PONTOS DE INTERESSE PRÓXIMOS:
         ${placesString}
+
+        INSTRUÇÃO IMPORTANTE:
+        Cite nominalmente alguns dos estabelecimentos listados acima (ex: "próximo ao Mercado X" ou "ao lado da Padaria Y") para dar credibilidade e mostrar a conveniência real da localização.
     `;
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GOOGLE_API_KEY}`;

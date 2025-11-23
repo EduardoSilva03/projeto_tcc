@@ -1,4 +1,5 @@
 const pool = require('../db');
+const bcrypt = require('bcrypt');
 
 const deleteMobileUser = async (req, res) => {
     const { id: mobileUserId } = req.params;
