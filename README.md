@@ -25,6 +25,11 @@ Terminal 4 (Mobile - Build & Run)
 cd AppMobile
 npx react-native run-android
 
+Teste I.A
+
+cd backend
+npm test
+
 # The-Portfolio-Playbook-I
 The-Portfolio-Playbook-I
 
