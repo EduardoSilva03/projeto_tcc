@@ -24,7 +24,7 @@ function Cadastro() {
     try {
       const response = await axios.post('http://localhost:5000/cadastro', formData);
       setMensagem(response.data.message);
-      setFormData({ nome: '', sobrenome: '', email: '', senha: '' }); // Limpa o formulário
+      setFormData({ nome: '', sobrenome: '', email: '', senha: '' });
     } catch (error) {
       setErro(error.response?.data?.error || 'Ocorreu um erro ao cadastrar.');
     }

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-// Importando ícones
 import { Building2, UserPlus, LogOut, Settings, Plus } from 'lucide-react';
 
 function Dashboard() {
