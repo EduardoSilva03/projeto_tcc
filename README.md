@@ -15,8 +15,8 @@ Siga as etapas abaixo na ordem apresentada para iniciar todos os componentes do 
 
 Abra o **primeiro terminal** para iniciar o servidor.
 
-cd backend
-npm run dev
+- cd backend
+- npm run dev
 
 **Nota:** O servidor deverá iniciar na porta 5000.
 
@@ -24,8 +24,8 @@ npm run dev
 
 Abra um **segundo terminal** para iniciar a aplicação web administrativa.
 
-cd frontend
-npm start
+- cd frontend
+- npm start
 
 **Nota:** O navegador deve abrir automaticamente em http://localhost:3000.
 
@@ -33,8 +33,8 @@ npm start
 
 Abra um **terceiro terminal.** Este processo é responsável por empacotar o código JavaScript para o aplicativo.
 
-cd AppMobile
-npx react-native start
+- cd AppMobile
+- npx react-native start
 
 **Importante:** Mantenha este terminal rodando.
 
@@ -42,15 +42,15 @@ npx react-native start
 
 Abra um **quarto terminal** para compilar e instalar o aplicativo no emulador.
 
-cd AppMobile
-npx react-native run-android
+- cd AppMobile
+- npx react-native run-android
 
 **Testes Automatizados**
 
 Para verificar a integridade das funcionalidades e da Inteligência Artificial, execute os testes unitários.
 
-cd backend
-npm test
+- cd backend
+- npm test
 
 # The-Portfolio-Playbook-I
 The-Portfolio-Playbook-I
