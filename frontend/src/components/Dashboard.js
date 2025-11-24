@@ -2,7 +2,30 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import { Building2, UserPlus, LogOut, Settings, Plus } from 'lucide-react';
+import { Building2, UserPlus, LogOut, Settings, Plus, Trash2 } from 'lucide-react';
+
+function ConfirmationModal({ message, onConfirm, onCancel, loading }) {
+    return (
+        <div style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
+            backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', 
+            justifyContent: 'center', alignItems: 'center', zIndex: 1000
+        }}>
+            <div className="form-container" style={{maxWidth: '400px', margin: 0}}>
+                <h3>Confirmar Exclusão</h3>
+                <p>{message}</p>
+                <div style={{display: 'flex', justifyContent: 'space-between', gap: '10px', marginTop: '20px'}}>
+                    <button onClick={onCancel} style={{backgroundColor: '#6c757d', width: '48%'}} disabled={loading}>
+                        Cancelar
+                    </button>
+                    <button onClick={onConfirm} className="logout-button" style={{width: '48%'}} disabled={loading}>
+                        {loading ? 'Excluindo...' : 'Excluir'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 function Dashboard() {
     const { logOut, token } = useContext(AuthContext);
@@ -10,34 +33,65 @@ function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    useEffect(() => {
-        if (token) {
-            const fetchEmpresas = async () => {
-                try {
-                    const headers = { 'Authorization': `Bearer ${token}` };
-                    const response = await axios.get('http://localhost:5000/empresas', { headers });
-                    setEmpresas(response.data);
-                } catch (err) {
-                    setError('Não foi possível carregar as empresas.');
-                } finally {
-                    setLoading(false);
-                }
-            };
-            fetchEmpresas();
+    const [empresaToDelete, setEmpresaToDelete] = useState(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+
+    const fetchEmpresas = async () => {
+        try {
+            const headers = { 'Authorization': `Bearer ${token}` };
+            const response = await axios.get('http://localhost:5000/empresas', { headers });
+            setEmpresas(response.data);
+        } catch (err) {
+            setError('Não foi possível carregar as empresas.');
+        } finally {
+            setLoading(false);
         }
+    };
+
+    useEffect(() => {
+        if (token) fetchEmpresas();
     }, [token]);
+
+    const handleDeleteClick = (empresa) => {
+        setEmpresaToDelete(empresa);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!empresaToDelete) return;
+        setDeleteLoading(true);
+        try {
+            const headers = { 'Authorization': `Bearer ${token}` };
+            await axios.delete(`http://localhost:5000/empresas/${empresaToDelete.id}`, { headers });
+            
+            setEmpresas(empresas.filter(e => e.id !== empresaToDelete.id));
+            setEmpresaToDelete(null);
+        } catch (err) {
+            alert(err.response?.data?.error || 'Erro ao excluir empresa.');
+        } finally {
+            setDeleteLoading(false);
+        }
+    };
 
     return (
         <div className="dashboard-container">
+            {empresaToDelete && (
+                <ConfirmationModal
+                    message={`Tem certeza que deseja excluir a empresa "${empresaToDelete.nome_fantasia || empresaToDelete.razao_social}"? Isso apagará TODOS os imóveis, fotos e vínculos de usuários associados a ela.`}
+                    onConfirm={handleConfirmDelete}
+                    onCancel={() => setEmpresaToDelete(null)}
+                    loading={deleteLoading}
+                />
+            )}
+
             <header className="dashboard-header">
                 <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
                     <Building2 size={32} color="#2563eb" />
                     <h1>Painel de Controle</h1>
                 </div>
                 <div style={{display: 'flex', gap: '10px'}}>
-                    <Link to="/dashboard/cadastro-mobile" className="button-add" style={{backgroundColor: '#64748b'}}>
+                    <Link to="/dashboard/cadastro-mobile" className="button-add" style={{backgroundColor: '#17a2b8', textDecoration: 'none'}}>
                         <UserPlus size={18} style={{marginRight: '8px'}}/>
-                        Usuários Mobile
+                        Gerenciar Usuários Mobile
                     </Link>
                     <button onClick={logOut} className="logout-button">
                         <LogOut size={18} style={{marginRight: '8px'}}/>
@@ -89,11 +143,19 @@ function Dashboard() {
                                                     {empresa.is_ativa ? 'ATIVA' : 'INATIVA'}
                                                 </span>
                                             </td>
-                                            <td style={{textAlign: 'right'}}>
+                                            <td style={{textAlign: 'right', display: 'flex', justifyContent: 'flex-end', gap: '10px'}}>
                                                 <Link to={`/dashboard/empresa/${empresa.id}`} className="button-admin">
                                                     <Settings size={16} style={{marginRight: '5px'}}/>
                                                     Gerenciar
                                                 </Link>
+                                                <button 
+                                                    onClick={() => handleDeleteClick(empresa)} 
+                                                    className="logout-button" 
+                                                    style={{padding: '6px 12px', fontSize: '0.85rem'}}
+                                                    title="Excluir Empresa"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}
