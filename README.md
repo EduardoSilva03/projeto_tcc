@@ -52,6 +52,10 @@ Para verificar a integridade das funcionalidades e da Inteligência Artificial, 
 - cd backend
 - npm test
 
+**Link do Vídeo:**
+
+- https://youtu.be/o2igIaX5OFs
+
 # The-Portfolio-Playbook-I
 The-Portfolio-Playbook-I
 

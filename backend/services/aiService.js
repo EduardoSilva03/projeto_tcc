@@ -2,7 +2,7 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 
-const GOOGLE_API_KEY = 'AIzaSyDTuAV_u0Cpwxo2lcQ6YKG2vD6r1RkHDhw';
+const GOOGLE_API_KEY = 'AIzaSyBZyfCHm-eKbykrLJfPV1aUzy6iuV92vzQ';
 
 function extractCoordsFromMapLink(url) {
     if (!url) return null;
