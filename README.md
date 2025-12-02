@@ -1,80 +1,115 @@
-**Guia de Execução do Projeto**
+# Plataforma de Gestão Imobiliária com Inteligência Artificial
 
-Siga as etapas abaixo na ordem apresentada para iniciar todos os componentes do sistema. **Você precisará de 4 terminais abertos simultaneamente.**
+> **Trabalho de Conclusão de Curso** | Curso de Engenharia de Software
+>
+> Uma solução Full-Stack integrada para modernizar a gestão de imóveis, substituindo processos manuais por automação inteligente e mobilidade.
 
-**Passo 0: Configuração do Ambiente**
+## 📋 Visão Geral do Projeto
 
-1. Antes de iniciar os terminais, certifique-se de que o dispositivo virtual está rodando.
-2. Abra o **Android Studio.**
-3. Acesse o **Virtual Device Manager**.
-4. Inicie o seu **Emulador Android**.
+Este projeto resolve problemas críticos na gestão de vendas de construtoras, como inconsistência de dados e conflitos de agendamento. A plataforma centraliza o cadastro de imóveis em um painel web administrativo e distribui as informações em tempo real para corretores através de um aplicativo móvel.
 
-**Aguarde** até que o sistema operacional do emulador esteja completamente carregado antes de prosseguir.
+**Diferencial Tecnológico:** Integração com **Google Gemini 1.5 Flash** e **Google Places API** para gerar automaticamente análises de vizinhança e descrições comerciais persuasivas para cada imóvel cadastrado.
 
-**Passo 1: Backend (API)**
+## 🚀 Principais Funcionalidades
 
-Abra o **primeiro terminal** para iniciar o servidor.
+### 🖥️ Painel Administrativo (Web)
 
-- cd backend
-- npm run dev
+* **Gestão Corporativa:** Cadastro e gerenciamento de múltiplas empresas/filiais.
+* **Controle de Acesso:** Cadastro de usuários mobile e vinculação específica a empresas.
+* **Catálogo de Imóveis:** CRUD completo de imóveis com upload de fotos e documentos.
+* **Geração de Conteúdo via I.A.:** Criação automática de descrições de venda baseadas na geolocalização do imóvel.
 
-**Nota:** O servidor deverá iniciar na porta 5000.
+### 📱 Aplicativo do Corretor (Mobile)
 
-**Passo 2: Frontend (Web)**
+* **Acesso Seguro:** Login único.
+* **Multi-Empresa:** Seleção de empresas para corretores que atendem múltiplas filiais.
+* **Busca Inteligente:** Filtros avançados por situação, valor e localização.
+* **Gestão de Visitas (Tempo Real):** Sistema de Reserva de Visita que impede conflitos de horário entre corretores.
+* **Informações Enriquecidas:** Visualização de carrossel de fotos, documentos técnicos e análise de vizinhança gerada por I.A.
 
-Abra um **segundo terminal** para iniciar a aplicação web administrativa.
+## 🛠️ Arquitetura e Tecnologias
 
-- cd frontend
-- npm start
+O sistema utiliza uma arquitetura **Cliente-Servidor Desacoplada**, garantindo escalabilidade e manutenção independente.
 
-**Nota:** O navegador deve abrir automaticamente em http://localhost:3000.
+* **Backend:** Node.js com Express (API RESTful).
+* **Banco de Dados:** PostgreSQL.
+* **Frontend Web:** React.js e CSS3.
+* **Mobile:** React Native.
+* **Inteligência Artificial:** Engenharia de Prompt utilizando Google Gemini.
+* **Qualidade:** Testes Unitários automatizados com Jest.
 
-**Passo 3: Mobile (Metro Bundler)**
+## ⚙️ Pré-requisitos de Instalação
 
-Abra um **terceiro terminal.** Este processo é responsável por empacotar o código JavaScript para o aplicativo.
+Certifique-se de ter o ambiente de desenvolvimento configurado:
 
-- cd AppMobile
-- npx react-native start
+* [Node.js] (v18 ou superior)
+* [PostgreSQL] (Serviço rodando na porta 5432)
+* [Android Studio] (Configurado com emulador)
+* Chave de API do Google Cloud (com *Generative Language API* e *Places API* ativadas)
 
-**Importante:** Mantenha este terminal rodando.
+## 🚀 Guia de Execução
 
-**Passo 4: Mobile (Instalação e Execução)**
+Para rodar a aplicação completa, você precisará de **4 terminais** abertos simultaneamente. Siga a ordem abaixo rigorosamente.
 
-Abra um **quarto terminal** para compilar e instalar o aplicativo no emulador.
+### Passo 1: Inicialização do Dispositivo
 
-- cd AppMobile
-- npx react-native run-android
+1. Abra o **Android Studio**.
+2. Acesse o **Virtual Device Manager**.
+3. Inicie seu **Emulador Android**.
+4. **Aguarde** o sistema operacional carregar completamente.
 
-**Testes Automatizados**
+### Passo 2: Backend (API)
 
-Para verificar a integridade das funcionalidades e da Inteligência Artificial, execute os testes unitários.
+No primeiro terminal, inicie o servidor.
 
-- cd backend
-- npm test
+```bash
+cd backend
+npm run dev
+```
+- O servidor iniciará na porta 5000 e conectará ao banco de dados.
 
-**Link do Vídeo:**
+### Passo 3: Frontend (Web)
 
-- https://youtu.be/o2igIaX5OFs
+No segundo terminal, inicie o painel administrativo.
 
-# The-Portfolio-Playbook-I
-The-Portfolio-Playbook-I
+```bash
+cd frontend
+npm start
+```
+- O navegador abrirá automaticamente em http://localhost:3000.
 
+### Passo 4: Mobile (Metro Bundler)
 
-# Índice
+No terceiro terminal, inicie o empacotador do React Native.
 
-- [Processo de Escolha de Tema e Aprovação para Projeto de Portfólio](https://github.com/CatolicaSC-Portfolio/The-Portfolio-Playbook-I/blob/main/aprovacao_tema.md)
-- [Modelo de RFC para Estruturação do Tema](https://github.com/CatolicaSC-Portfolio/The-Portfolio-Playbook-I/blob/main/modelo-de-RFC.md)
-- [Portfólio Directions](https://github.com/CatolicaSC-Portfolio/The-Portfolio-Playbook-I/blob/main/portfolio-directions.md)
-- [Diretrizes-Avaliação-Professores](https://github.com/CatolicaSC-Portfolio/The-Portfolio-Playbook-I/blob/main/Diretrizes-Avaliação-Professores.md)
+```bash
+cd AppMobile
+npx react-native start
+```
+- Mantenha este terminal rodando em segundo plano para servir os arquivos JavaScript ao app.
 
+### Passo 5: Mobile (Instalação)
 
-# Visão Geral
+No quarto terminal, compile e instale o app no emulador.
 
-<img width="930" alt="image" src="https://github.com/CatolicaSC-Portfolio/The-Portfolio-Playbook-I/assets/1449952/2eecc157-2f91-4e49-9fc8-532d54f1aa17">
+```bash
+cd AppMobile
+npx react-native run-android
+```
+- Aguarde a mensagem BUILD SUCCESSFUL. O aplicativo abrirá automaticamente no emulador.
 
+### ✅ Verificação de Qualidade (Testes)
 
+Para validar as regras de negócio e a integridade da integração com a I.A., execute a suíte de testes automatizados:
 
+```bash
+cd backend
+npm test
+```
 
-# Links
+### 📺 Demonstração
 
-Link para [Playbook de Portfólio II](https://github.com/CatolicaSC-Portfolio/The-Portfolio-Playbook-II)
+**Vídeo de Apresentação:** [Assista no YouTube](https://youtu.be/o2igIaX5OFs)
+
+### 📚 Documentação Completa
+Para detalhes sobre a arquitetura, regras de negócio e o projeto completo, acesse nossa Wiki: [Wiki do Projeto](https://github.com/EduardoSilva03/projeto_tcc/wiki)
